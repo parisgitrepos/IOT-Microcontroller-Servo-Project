@@ -1,7 +1,7 @@
-import socket
+import usocket as socket
 from urllib.parse import parse_qs
-import threading
-import time
+import uthreading as threading
+import utime as time
 
 class Network_Selection:
 
