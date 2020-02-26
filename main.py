@@ -1,18 +1,27 @@
-from network_selection import Network_Selection
+from network_selection import NetworkSelection
 import network
-import utime as time
+import time
+from mqtt import ServoStatusRequest
 
 wifi = network.WLAN(network.STA_IF)
-wifi.activate(True)
+wifi.active(True)
 
-while not wifi.isconnected():
-    ssid_list = []
-    for a in wifi.scan():
-        ssid_list.append(a[0])
+test = 0
+while test == 0:
+    if wifi.isconnected():
+        publish = ServoStatusRequest()
+        publish.MQTT_publish(200)
+        test+=1
 
-    configure_network = Network_Selection(ssid_list = ssid_list, ip = '', port = 25501, welcome_message = 'Welcome to the WiFi Configuration Portal!')
-    ssid = configure_network.ssid
-    password = configure_network.password
-
-    wifi.connect(ssid, password)
-    time.sleep(5)
+    else:
+        ssid_list = []
+        wifi_scan_list = wifi.scan()
+        for a in wifi_scan_list:
+            ssid_list.append(a[0])
+        ap = network.WLAN(network.AP_IF)
+        ap.active(True)
+        ap.config(essid = 'ESP-Network-Config')
+        configure = NetworkSelection(ssid_list, ap.ifconfig()[0], 11999, 'Welcome to the WiFi configuration portal!')
+        wifi.connect(configure.ssid, configure.password)
+        ap.active(False)
+        time.sleep(3)

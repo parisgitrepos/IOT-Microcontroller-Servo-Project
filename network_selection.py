@@ -1,9 +1,9 @@
 import usocket as socket
 from urllib.parse import parse_qs
-import uthreading as threading
-import utime as time
+import _thread as thread
+import time
 
-class Network_Selection:
+class NetworkSelection:
 
     def __init__(self, ssid_list, ip, port, welcome_message):
         self.welcome_message = welcome_message
@@ -28,8 +28,7 @@ class Network_Selection:
             except OSError:
                 time.sleep(2)
 
-        server_thread = threading.Thread(target=self.server_accepting, args=(self.server,))
-        server_thread.start()
+        server_thread = thread.start_new_thread(self.server_accepting, args=(self.server,))
 
         while self.ssid is None:
             pass
@@ -71,10 +70,6 @@ class Network_Selection:
         while self.ssid is None:
             try:
                 conn, addr = server.accept()
-                thread = threading.Thread(target = self.client_handling, args = (conn,))
-                thread.start()
+                thread = thread.start_new_thread(self.client_handling, args = (conn,))
             except:
                 server.close()
-
-test = Network_Selection(['test', 'test2'], 'localhost', 12345)
-print(test.ssid, test.password)
