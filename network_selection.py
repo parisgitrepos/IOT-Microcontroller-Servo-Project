@@ -1,6 +1,4 @@
-import usocket as socket
-from urllib.parse import parse_qs
-import _thread as thread
+import socket as socket
 import time
 
 class NetworkSelection:
@@ -28,12 +26,15 @@ class NetworkSelection:
             except OSError:
                 time.sleep(2)
 
-        server_thread = thread.start_new_thread(self.server_accepting, args=(self.server,))
-
         while self.ssid is None:
-            pass
+            try:
+                conn, addr = self.server.accept()
+                self.client_handling(conn)
 
-        self.server.close()
+            except Exception as e:
+                print(e)
+                self.server.close()
+                break
 
     def client_handling(self, conn):
         method = conn.recv(1024).decode()
@@ -43,7 +44,7 @@ class NetworkSelection:
             conn.send('Content-Type: text/html\n\n'.encode())
             html = """
                     <html>
-                    <h1>{{welcome_message}}</h1>
+                    <h1>{welcome_message}</h1>
                     <br>
                     <h2>Please select your network from this list. If you do not see your network, try moving close to your router.</h2>
                     <h3>{ssid_strings}</h3>
@@ -58,18 +59,10 @@ class NetworkSelection:
                     <input type="submit">
                     </form>
                     </html>
-                    """.format(ssid_strings=self.ssid_strings, max=max, welcome_message = self.welcome_message)
+                    """.format(ssid_strings = self.ssid_strings, max = max, welcome_message = self.welcome_message)
             conn.send(html.encode())
         elif 'POST' in method:
-            network_num = parse_qs(parse_qs(method)['q'][3])['0.9\r\n\r\nSSID'][0]
-            network_password = parse_qs(method)['password'][0]
-            self.ssid = self.ssid_list[network_num]
-            self.password = network_password
+            self.ssid = method
+            print(method)
 
-    def server_accepting(self, server):
-        while self.ssid is None:
-            try:
-                conn, addr = server.accept()
-                thread = thread.start_new_thread(self.client_handling, args = (conn,))
-            except:
-                server.close()
+test = NetworkSelection(['test1', 'test2'], 'localhost', 12345, 'Test network selection!')
