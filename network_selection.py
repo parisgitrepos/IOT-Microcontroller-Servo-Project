@@ -1,4 +1,4 @@
-import socket as socket
+import usocket as socket
 import time
 
 class NetworkSelection:
