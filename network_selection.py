@@ -8,7 +8,7 @@ class NetworkSelection:
         self.ssid_list = ssid_list
         self.ssid_strings = ''
         for a in range(len(ssid_list)):
-            value = str(a) + '.' + ' ' + ssid_list[a] + '<br>'
+            value = str(a) + '.' + ' ' + str(ssid_list[a]) + '<br>'
             self.ssid_strings += value
 
         self.ip = ip
@@ -20,7 +20,7 @@ class NetworkSelection:
         server_online = False
         while not server_online:
             try:
-                self.server.bind(('', port))
+                self.server.bind((self.ip, self.port))
                 self.server.listen()
                 server_online = True
             except OSError:
