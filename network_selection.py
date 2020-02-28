@@ -32,14 +32,13 @@ class NetworkSelection:
                 self.client_handling(conn)
 
             except Exception as e:
-                print(e)
                 self.server.close()
                 break
 
     def client_handling(self, conn):
         method = conn.recv(1024).decode()
         if 'GET' in method:
-            max = len(self.ssid_list) - 1
+            max_list = len(self.ssid_list) - 1
             conn.send('HTTP/1.0 200 OK\n'.encode())
             conn.send('Content-Type: text/html\n\n'.encode())
             html = """
@@ -59,10 +58,12 @@ class NetworkSelection:
                     <input type="submit">
                     </form>
                     </html>
-                    """.format(ssid_strings = self.ssid_strings, max = max, welcome_message = self.welcome_message)
+                    """.format(ssid_strings = self.ssid_strings, max = max_list, welcome_message = self.welcome_message)
             conn.send(html.encode())
         elif 'POST' in method:
-            self.ssid = method
-            print(method)
+            self.ssid = int(method.split('SSID=', 1)[1][0])
+            self.ssid = self.ssid_list[self.ssid]
+            self.password = method.split('password=')[1]
 
-test = NetworkSelection(['test1', 'test2'], 'localhost', 12345, 'Test network selection!')
+example = NetworkSelection(['test1', 'test2'], 'localhost', 12345, 'Test network selection!')
+print(example.ssid + '\n' + example.password)
