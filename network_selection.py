@@ -21,7 +21,7 @@ class NetworkSelection:
         while not server_online:
             try:
                 self.server.bind((self.ip, self.port))
-                self.server.listen()
+                self.server.listen(2)
                 server_online = True
             except OSError:
                 time.sleep(2)
@@ -59,11 +59,8 @@ class NetworkSelection:
                     </form>
                     </html>
                     """.format(ssid_strings = self.ssid_strings, max = max_list, welcome_message = self.welcome_message)
-            conn.send(html.encode())
+            conn.sendall(html.encode())
         elif 'POST' in method:
-            self.ssid = int(method.split('SSID=', 1)[1][0])
+            self.ssid = int(str(method.split('SSID=', 1)[1]).split('password=')[0])
             self.ssid = self.ssid_list[self.ssid]
             self.password = method.split('password=')[1]
-
-example = NetworkSelection(['test1', 'test2'], 'localhost', 12345, 'Test network selection!')
-print(example.ssid + '\n' + example.password)

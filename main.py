@@ -17,7 +17,7 @@ while test == 0:
         ssid_list = []
         wifi_scan_list = wifi.scan()
         for a in wifi_scan_list:
-            ssid_list.append(a[0])
+            ssid_list.append(a[0].decode('utf-8'))
         ap = network.WLAN(network.AP_IF)
         ap.active(True)
         ap.config(essid = 'ESP-Network-Config')
