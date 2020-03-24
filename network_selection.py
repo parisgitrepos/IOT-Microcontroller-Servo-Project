@@ -30,7 +30,6 @@ class NetworkSelection:
             try:
                 conn, addr = self.server.accept()
                 self.client_handling(conn)
-
             except Exception as e:
                 print(e)
                 self.server.close()
