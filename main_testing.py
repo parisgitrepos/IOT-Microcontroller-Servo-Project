@@ -24,7 +24,7 @@ class MainTesting:
                 ap.active(True)
                 ap.config(essid = 'ESP-Network-Config')
                 configure = NetworkSelection(ssid_list, '0.0.0.0', 11999, 'Welcome to the WiFi configuration portal!')
-                print('User WiFi setup done. SSID:', configure.ssid, 'Password:', configure.password)
+                print('User WiFi setup done. SSID:', configure.ssid + '\nPassword:', configure.password)
                 wifi.connect(configure.ssid, configure.password)
                 ap.active(False)
                 time.sleep(3)
