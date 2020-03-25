@@ -12,7 +12,7 @@ class MainTesting:
         while test == 0:
             if wifi.isconnected():
                 publish = ServoStatusRequest()
-                publish.MQTT_publish(200)
+                publish.MQTT_publish('Test')
                 test+=1
 
             else:

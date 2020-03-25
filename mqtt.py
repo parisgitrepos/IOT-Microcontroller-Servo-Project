@@ -11,7 +11,7 @@ class ServoStatusRequest:
 
     def modify_servo_pos(self, topic, message):
         print(message)
-    #     Add code to modify servo pos according to request and then update servo status
+    #     Add code to modify servo pos. according to request and then update servo status
 
     def mqtt_subscribe_to_request(self):
         self.check_messages = True
@@ -23,8 +23,8 @@ class ServoStatusRequest:
             time.sleep(5)
         client.disconnect()
 
-    def MQTT_publish(self, value):
-        client = MQTTClient('umqtt_client', self.mqtt_url)
-        client.connect(self.current_status_topic)
+    def MQTT_publish(self, value:str):
+        client = MQTTClient('esp_mqtt', self.mqtt_url)
+        client.connect()
         client.publish(self.current_status_topic.encode(), value.encode())
         client.disconnect()
