@@ -21,7 +21,6 @@ while test == 0:
         ap = network.WLAN(network.AP_IF)
         ap.active(True)
         ap.config(essid = 'ESP-Network-Config')
-        configure = NetworkSelection(ssid_list, '0.0.0.0', 11999, 'Welcome to the WiFi configuration portal!')
-        wifi.connect(configure.ssid, configure.password)
+        NetworkSelection(ssid_list, '0.0.0.0', 11999, 'Welcome to the WiFi configuration portal!', wifi)
         ap.active(False)
         time.sleep(3)

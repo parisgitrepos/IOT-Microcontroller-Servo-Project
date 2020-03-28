@@ -3,7 +3,7 @@ import time
 
 class NetworkSelection:
 
-    def __init__(self, ssid_list, ip, port, welcome_message):
+    def __init__(self, ssid_list, ip, port, welcome_message, network_object):
         self.welcome_message = welcome_message
         self.ssid_list = ssid_list
         self.ssid_strings = ''
@@ -11,10 +11,10 @@ class NetworkSelection:
             value = str(a) + '.' + ' ' + str(ssid_list[a]) + '<br>'
             self.ssid_strings += value
 
+        self.wifi = network_object
         self.ip = ip
         self.port = port
-        self.ssid = None
-        self.password = None
+        self.wifi_connected = False
 
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server_online = False
@@ -26,7 +26,7 @@ class NetworkSelection:
             except OSError:
                 time.sleep(2)
 
-        while self.ssid is None:
+        while self.wifi_connected is False:
             try:
                 conn, addr = self.server.accept()
                 self.client_handling(conn)
@@ -62,8 +62,42 @@ class NetworkSelection:
             conn.sendall(html.encode())
         elif 'POST' in method:
             method += conn.recv(2048).decode()
-            self.ssid = int(str(method.split('SSID=', 1)[1]).split('password=')[0][:-1])
-            print(self.ssid)
-            self.ssid = self.ssid_list[self.ssid]
-            self.password = method.split('password=')[1]
-            print(self.password)
+            ssid = self.ssid_list[int(str(method.split('SSID=', 1)[1]).split('password=')[0][:-1])]
+            password = method.split('password=')[1]
+            self.wifi.connect(ssid, password)
+
+            connecting = True
+            while connecting:
+                status = int(self.wifi.status())
+                if status == 1:
+                    pass
+                else:
+                    connecting = False
+
+            if status == 5:
+                status = 'Connected'
+                self.wifi_connected = True
+            elif status == 0:
+                status = 'ERROR - No activity'
+            elif status == 2:
+                status = 'ERROR - Incorrect password'
+            elif status == 3:
+                status = 'ERROR - No AP replied'
+            elif status == 4:
+                status = 'ERROR - Unknown error'
+            else:
+                status = 'ERROR - Unknown error'
+
+            html = """
+                <html>
+                <head>
+                </head>
+                <body>
+                <h3>Status: {status}</h3>
+                <h3>If your network connection resulted in an error, please refresh the page and try again.</h3>
+                </body>
+                </html>
+                """.format(status = status).encode()
+            conn.send('HTTP/1.0 200 OK\n'.encode())
+            conn.send('Content-Type: text/html\n\n'.encode())
+            conn.sendall(html)
